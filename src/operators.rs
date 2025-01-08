@@ -83,7 +83,13 @@ pub fn swiglu(y: &mut Tensor<f32>, x: &Tensor<f32>) {
     // let _y = unsafe { y.data_mut() };
     // let _x = x.data();
 
-    todo!("实现 silu，这里给了一些前期准备工作的提示，你可以参考")
+    let len = y.size();
+    assert!(len == x.size());
+    let y_ = unsafe { y.data_mut() };
+    let x_ = x.data();
+    for i in 0..len {
+        y_[i] *= x_[i] / (1. + (-x_[i]).exp());
+    }
 }
 
 // C = beta * C + alpha * A @ B^T

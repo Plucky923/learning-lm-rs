@@ -24,9 +24,9 @@ impl LLamaParams<f32> {
     pub fn from_safetensors(safetensor: &SafeTensors, config: &LlamaConfigJson) -> Self {
         todo!("实现从safetensors文件的模型参数加载");
         // let get_tensor: impl Fn(&str) -> Tensor<f32> = |name: &str| {
-        // ...    
+        // ...
         // };
-        
+
         // LLamaParams {
         //     embedding_table: get_tensor(...),
         //     ...
