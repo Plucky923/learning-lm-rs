@@ -19,7 +19,7 @@
 
 ### 1. 算子：SiLU函数（10分）
 
-请在`src/operators.rs`中实现SwiGLU算子，其公式为：
+请在 `src/operators.rs`中实现SwiGLU算子，其公式为：
 
 $$
 y=silu(x) × y
@@ -38,16 +38,13 @@ $$
 注意：
 
 - $`y`$ 既是输入，也存储最终输出。
-
 - 该算子是element-wise操作而非向量点乘，即单次运算只涉及输入和输出张量中对应的元素。
-
 - 你可以默认输入输出长度相同，不用考虑广播的情况。
-
-- 用`src/operators.rs`中的测例检验你的实现是否正确。
+- 用 `src/operators.rs`中的测例检验你的实现是否正确。
 
 ### 2. 算子：RMS Normalization（20分）
 
-请在`src/operators.rs`中实现RMS Normalization，其公式为：
+请在 `src/operators.rs`中实现RMS Normalization，其公式为：
 
 $$
 y_i=\frac{w×x_i}{\sqrt{ \frac{1}{n} \sum_{j} x_{ij}^2 +\epsilon}}
@@ -56,12 +53,11 @@ $$
 注意：
 
 - 你可以只考虑对最后一维进行计算的情况。即张量 $X(...,n)$ 和 $Y(...,n)$ 都是由若干个长度为 $n$ 的向量 $x_i, y_i$ 组成的，每次求和都在向量内进行。参数 $`w`$ 是个一维向量，与各个向量长度相同，且进行element-wise乘法。
-
-- 用`src/operators.rs`中的测例检验你的实现是否正确。
+- 用 `src/operators.rs`中的测例检验你的实现是否正确。
 
 ### 3. 算子：矩阵乘（30分）
 
-想必前两个算子的实现中你已经充分热身，那么重量级的来了。请在`src/operators.rs`中实现矩阵乘（Transpose B）算子，其公式为：
+想必前两个算子的实现中你已经充分热身，那么重量级的来了。请在 `src/operators.rs`中实现矩阵乘（Transpose B）算子，其公式为：
 
 $$
 C=\alpha AB^T + \beta C
@@ -75,13 +71,13 @@ $$
 
 你可以默认输入输出都是二维矩阵，即 $`A`$ 形状为 $`m×k`$，$`B`$ 形状为 $`n×k`$，$`C`$ 形状为 $`m×n`$，可以不用考虑广播的情况。到了项目部分，你有可能需要（非必须）实现支持广播的矩阵乘，比如$`(b, h, m, k) · (b, 1, k, n)`$ 这种情况，你可以去pytorch官方文档看到关于broadcast的规则。
 
-你可以用`src/operators.rs`中的测例检验你的实现是否正确。
+你可以用 `src/operators.rs`中的测例检验你的实现是否正确。
 
 ### 4. 模型结构：Feed-Forward神经网络（20分）
 
-请在`src/models.rs`中实现Feed-Forward神经网络（mlp函数），计算过程如下：
+请在 `src/models.rs`中实现Feed-Forward神经网络（mlp函数），计算过程如下：
 
-``` python
+```python
 hidden = rms_norm(residual)
 gate = hidden @ gate_weight.T
 up = hidden @ up_weight.T
@@ -90,11 +86,11 @@ output = act @ down_weight.T
 residual = output + residual
 ```
 
-如果你正确地实现了之前地几个算子，那么这个函数的实现应该是相当简单的。需要注意的是，上一层的输出存储于residual这个临时张量中，这就是用到了我们之前提到的残差连接的概念，最终我们实现的神经网络的输出也要加上前一层的residual并存储于residual中，以便于下一层的计算。hidden_states则用于存储过程中的计算结果。你可以用`src/model.rs`中的测例检验你的实现是否正确。
+如果你正确地实现了之前地几个算子，那么这个函数的实现应该是相当简单的。需要注意的是，上一层的输出存储于residual这个临时张量中，这就是用到了我们之前提到的残差连接的概念，最终我们实现的神经网络的输出也要加上前一层的residual并存储于residual中，以便于下一层的计算。hidden_states则用于存储过程中的计算结果。你可以用 `src/model.rs`中的测例检验你的实现是否正确。
 
 ### 5. Llama模型参数加载（20分）
 
-请结合课上所讲的模型结构，根据代码种的定义在`src/params.rs`以及`src/model.rs`中补全大模型参数加载代码。项目已经为你做好了safetensors以及json文件的读取功能，你需要将参数原始数据以代码中的形式存于正确的位置，并赋予模型对象正确的config属性。safetensors里带有各张量的名称，应该足够你判断出张量代表的是哪个参数。
+请结合课上所讲的模型结构，根据代码种的定义在 `src/params.rs`以及 `src/model.rs`中补全大模型参数加载代码。项目已经为你做好了safetensors以及json文件的读取功能，你需要将参数原始数据以代码中的形式存于正确的位置，并赋予模型对象正确的config属性。safetensors里带有各张量的名称，应该足够你判断出张量代表的是哪个参数。
 
 以下是大模型config中一些比较重要的属性的含义：
 
@@ -121,7 +117,7 @@ residual = output + residual
 - safetensors里存储的是原始数据，你需要以FP32的形式读取出来，创建出项目所使用的张量。
 - safetensors包含张量的形状，你无需对原始张量做任何变形。
 - 当"tie_word_embeddings"属性被打开时，模型最开始以及最后的embedding矩阵数据相同，safetensors会只存储一份数据，我们测试用的story模型就是这样。作业阶段你可以只关心story模型，但是后续项目中你需要处理两个矩阵不同的情况。
-- 你可以用`src/model.rs`中的测例检验你的实现是否正确。
+- 你可以用 `src/model.rs`中的测例检验你的实现是否正确。
 
 ## 二、项目阶段
 
@@ -139,7 +135,7 @@ residual = output + residual
 
 对于每个头，完整的Self-Attention层的计算过程如下；
 
-``` python
+```python
 x = rms_norm(residual)
 Q = RoPE(x @ Q_weight.T)
 K = RoPE(x @ K_weight.T)
@@ -158,25 +154,25 @@ Self-Attention的调试是很困难的。这里推荐大家使用pytorch来辅�
 
 ### 2. 功能：文本生成
 
-请在`src/model.rs`中补充forward函数的空白部分，实现generate函数。注意在foward函数的准备阶段，我们定义了几个计算用的临时张量，这是为了在多层计算中不重复分配内存，这些临时张量会作为算子函数调用的参数，你可以根据自己的需要更改这一部分（你其实可以用比这更小的空间）。
+请在 `src/model.rs`中补充forward函数的空白部分，实现generate函数。注意在foward函数的准备阶段，我们定义了几个计算用的临时张量，这是为了在多层计算中不重复分配内存，这些临时张量会作为算子函数调用的参数，你可以根据自己的需要更改这一部分（你其实可以用比这更小的空间）。
 
 文本生成所需的采样的算子已为你写好。你需要初始化一个会被复用的kvcache，并写一个多轮推理的循环，每一轮的输出作为下一轮的输入。你需要根据用户传的最大生成token数以及是否出现结束符来判断是否停止推理，并返回完整推理结果。
 
-所使用的模型在`models/story`中。`src/main.rs`已经为你写好了tokenizer的编码和解码，代码完成后，可以直接执行main函数。
+所使用的模型在 `models/story`中。`src/main.rs`已经为你写好了tokenizer的编码和解码，代码完成后，可以直接执行main函数。
 
 ### 3. （可选）功能：AI对话
 
 仿照文本生成的功能，写一个实现AI对话的chat函数，之后你可以搭建一个支持用户输入的命令行应用。你需要在多轮对话中，保存和管理用户的kvcache。
 
-你可以使用`models/chat`中的对话模型。其对话模板如下：
+你可以使用 `models/chat`中的对话模型。其对话模板如下：
 
-``` text
+```text
 "{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
 ```
 
 这种模板语言叫做Jinja2，在本项目中你可以不用实现任意模板的render功能，直接在代码中内置这个模板。你可以忽略system角色功能。下面是一个首轮输入的例子：
 
-``` text
+```text
 <|im_start|>system
 {system_message}<|im_end|>
 <|im_start|>user

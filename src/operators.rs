@@ -71,7 +71,44 @@ pub fn masked_softmax(y: &mut Tensor<f32>) {
 }
 
 pub fn rms_norm(y: &mut Tensor<f32>, x: &Tensor<f32>, w: &Tensor<f32>, epsilon: f32) {
-    todo!("实现 rms_norm，计算前做一些必要的检查会帮助你后续调试")
+    let len = y.size();
+    println!("{:?}", len);
+    assert!(len == x.size());
+
+    let ndim = y.shape().len();
+    let total_seq_len = y.shape()[ndim - 1];
+    assert!(w.size() == total_seq_len);
+
+    if ndim == 1 {
+        let _y = unsafe { y.data_mut() };
+        let _x = x.data();
+        let _w = w.data();
+        let bottom = _w.iter().map(|v| v * v).sum::<f32>() / len as f32 + epsilon;
+        for i in 0..len {
+            _y[i] = _x[i] * _w[i] / bottom.sqrt();
+        }
+    } else {
+        let seq_len = y.shape()[ndim - 2];
+        let _y = unsafe { y.data_mut() };
+        let _x = x.data();
+        let _w = w.data();
+        let batch = len / (seq_len * total_seq_len);
+        for b in 0..batch {
+            let base = b * seq_len * total_seq_len;
+            for i in 0..seq_len {
+                let offset = base + i * total_seq_len;
+                let bottom = _x[offset..offset + total_seq_len]
+                    .iter()
+                    .map(|v| v * v)
+                    .sum::<f32>()
+                    / total_seq_len as f32
+                    + epsilon;
+                for j in 0..total_seq_len {
+                    _y[offset + j] = _x[offset + j] * _w[j] / bottom.sqrt();
+                }
+            }
+        }
+    }
 }
 
 // y = silu(x) * y
