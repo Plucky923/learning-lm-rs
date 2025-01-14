@@ -132,7 +132,29 @@ pub fn swiglu(y: &mut Tensor<f32>, x: &Tensor<f32>) {
 // C = beta * C + alpha * A @ B^T
 // hint: You don't need to do an explicit transpose of B
 pub fn matmul_transb(c: &mut Tensor<f32>, beta: f32, a: &Tensor<f32>, b: &Tensor<f32>, alpha: f32) {
-    todo!("实现 matmul_transb，计算前做一些必要的检查会帮助你后续调试");
+    let a_shape = a.shape();
+    let b_shape = b.shape();
+    let c_shape = c.shape().clone();
+    assert!(a_shape.len() == 2);
+    assert!(b_shape.len() == 2);
+    assert!(c_shape.len() == 2);
+    assert!(a_shape[1] == b_shape[1]);
+    assert!(a_shape[0] == c_shape[0]);
+    assert!(b_shape[0] == c_shape[1]);
+
+    let mut _c = unsafe { c.data_mut() };
+    let _a = a.data();
+    let _b = b.data();
+
+    for i in 0..c_shape[0] {
+        for j in 0..c_shape[1] {
+            let mut sum = 0.0;
+            for k in 0..a_shape[1] {
+                sum += (_a[i * a_shape[1] + k] * _b[j * b_shape[1] + k]) * alpha;
+            }
+            _c[i * c_shape[1] + j] = _c[i * c_shape[1] + j] * beta + sum;
+        }
+    }
 }
 
 // Dot product of two tensors (treated as vectors)
@@ -247,6 +269,8 @@ fn test_matmul_transb() {
     let a = Tensor::<f32>::new(vec![1., 2., 3., 4., 5., 6.], &vec![2, 3]);
     let b = Tensor::<f32>::new(vec![1., 2., 3., 4., 5., 6.], &vec![2, 3]);
     matmul_transb(&mut c, 1., &a, &b, 1.);
+
+    println!("{:?}", c.data());
     assert!(c.close_to(
         &Tensor::<f32>::new(vec![15., 34., 35., 81.], &vec![2, 2]),
         1e-3
