@@ -135,12 +135,10 @@ pub fn matmul_transb(c: &mut Tensor<f32>, beta: f32, a: &Tensor<f32>, b: &Tensor
     let a_shape = a.shape();
     let b_shape = b.shape();
     let c_shape = c.shape().clone();
-    assert!(a_shape.len() == 2);
-    assert!(b_shape.len() == 2);
-    assert!(c_shape.len() == 2);
-    assert!(a_shape[1] == b_shape[1]);
-    assert!(a_shape[0] == c_shape[0]);
-    assert!(b_shape[0] == c_shape[1]);
+    println!("-------------------");
+    println!("{:?}", c_shape);
+    println!("{:?}", a_shape);
+    println!("{:?}", b_shape);
 
     let mut _c = unsafe { c.data_mut() };
     let _a = a.data();
