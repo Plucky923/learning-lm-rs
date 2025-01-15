@@ -286,3 +286,5 @@ pub fn test_load_safetensors() {
     ));
     assert!(float_eq(&model.params.wo[0].data()[100], &0.01965332, 1e-6));
 }
+
+// 可以先把safetensors打印出来看里面的tensor的name
