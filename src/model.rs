@@ -170,6 +170,7 @@ fn mlp(
     rms_norm(hidden_states, residual, rms_w, eps);
     matmul_transb(gate, 0., hidden_states, w_gate, 1.0);
     matmul_transb(up, 0., hidden_states, w_up, 1.0);
+    swiglu(up, &gate);
     let mut output = Tensor::<f32>::default(&hidden_states.shape());
     matmul_transb(&mut output, 0., &up, &w_down, 1.);
     // residual = output + residual
